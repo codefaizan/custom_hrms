@@ -284,6 +284,28 @@ class SalarySlip(TransactionBase):
 		else:
 			self.payment_days = 0
 
+	def get_payment_days(self, include_holidays_in_total_working_days):
+		if self.joining_date and self.joining_date > getdate(self.end_date):
+			# employee joined after payroll date
+			return 0
+
+		if self.relieving_date:
+			employee_status = frappe.db.get_value("Employee", self.employee, "status")
+			if self.relieving_date < getdate(self.start_date) and employee_status != "Left":
+				frappe.throw(
+					_("Employee {0} relieved on {1} must be set as 'Left'").format(
+						get_link_to_form("Employee", self.employee), formatdate(self.relieving_date)
+					)
+				)
+
+		payment_days = date_diff(self.actual_end_date, self.actual_start_date) + 1
+
+		if not cint(include_holidays_in_total_working_days):
+			holidays = self.get_holidays_for_employee(self.actual_start_date, self.actual_end_date)
+			payment_days -= len(holidays)
+
+		return payment_days
+
 	def get_holidays_for_employee(self, start_date, end_date):
 		holiday_list = get_holiday_list_for_employee(self.employee)
 		key = f"{holiday_list}:{start_date}:{end_date}"
