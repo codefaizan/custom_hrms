@@ -434,6 +434,24 @@ class SalarySlip(TransactionBase):
 			for row in self._salary_structure_doc.get(table):
 				row.condition = sanitize_expression(row.condition)
 				row.formula = sanitize_expression(row.formula)
+
+	def set_time_sheet(self):
+		if self.salary_slip_based_on_timesheet:
+			self.set("timesheets", [])
+
+			Timesheet = frappe.qb.DocType("Timesheet")
+			timesheets = (
+				frappe.qb.from_(Timesheet)
+				.select(Timesheet.star)
+				.where(
+					(Timesheet.employee == self.employee)
+					& (Timesheet.start_date.between(self.start_date, self.end_date))
+					& ((Timesheet.status == "Submitted") | (Timesheet.status == "Billed"))
+				)
+			).run(as_dict=1)
+
+			for data in timesheets:
+				self.append("timesheets", {"time_sheet": data.name, "working_hours": data.total_hours})
 	
 	
 
