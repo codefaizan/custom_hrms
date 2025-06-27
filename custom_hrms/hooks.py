@@ -130,7 +130,7 @@ app_license = "mit"
 # Override standard doctype classes
 
 override_doctype_class = {
- 	"Salary Slip": "test.custom_hrms.hrms_pakistan.cal_tax.SalarySlip"
+ 	"Salary Slip": "custom_hrms.hrms_pakistan.cal_tax.SalarySlip"
 }
 
 # Document Events
