@@ -84,6 +84,20 @@ class SalarySlip(TransactionBase):
 	# def autoname(self):
 	# 	self.name = make_autoname(self.series)
 
+	def validate_dates(self):
+		self.validate_from_to_dates("start_date", "end_date")
+
+		if not self.joining_date:
+			frappe.throw(
+				_("Please set the Date Of Joining for employee {0}").format(frappe.bold(self.employee_name))
+			)
+
+		if date_diff(self.end_date, self.joining_date) < 0:
+			frappe.throw(_("Cannot create Salary Slip for Employee joining after Payroll Period"))
+
+		if self.relieving_date and date_diff(self.relieving_date, self.start_date) < 0:
+			frappe.throw(_("Cannot create Salary Slip for Employee who has left before Payroll Period"))
+
 	@frappe.whitelist()
 	def get_emp_and_working_day_details(self):
 		"""First time, load all the components from salary structure"""
