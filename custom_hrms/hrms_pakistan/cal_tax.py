@@ -84,6 +84,17 @@ class SalarySlip(TransactionBase):
 	# def autoname(self):
 	# 	self.name = make_autoname(self.series)
 
+	@property
+	def joining_date(self):
+		if not hasattr(self, "__joining_date"):
+			self.__joining_date = frappe.get_cached_value(
+				"Employee",
+				self.employee,
+				"date_of_joining",
+			)
+
+		return self.__joining_date
+
 	def validate_dates(self):
 		self.validate_from_to_dates("start_date", "end_date")
 
