@@ -213,6 +213,48 @@ class SalarySlip(TransactionBase):
 
 		return current_tax_amount
 	
+	def check_sal_struct(self):
+		ss = frappe.qb.DocType("Salary Structure")
+		ssa = frappe.qb.DocType("Salary Structure Assignment")
+
+		query = (
+			frappe.qb.from_(ssa)
+			.join(ss)
+			.on(ssa.salary_structure == ss.name)
+			.select(ssa.salary_structure)
+			.where(
+				(ssa.docstatus == 1)
+				& (ss.docstatus == 1)
+				& (ss.is_active == "Yes")
+				& (ssa.employee == self.employee)
+				& (
+					(ssa.from_date <= self.start_date)
+					| (ssa.from_date <= self.end_date)
+					| (ssa.from_date <= self.joining_date)
+				)
+			)
+			.orderby(ssa.from_date, order=Order.desc)
+			.limit(1)
+		)
+
+		if not self.salary_slip_based_on_timesheet and self.payroll_frequency:
+			query = query.where(ss.payroll_frequency == self.payroll_frequency)
+
+		st_name = query.run()
+
+		if st_name:
+			self.salary_structure = st_name[0][0]
+			return self.salary_structure
+
+		else:
+			self.salary_structure = None
+			frappe.msgprint(
+				_("No active or default Salary Structure found for employee {0} for the given dates").format(
+					self.employee
+				),
+				title=_("Salary Structure Missing"),
+			)
+	
 	def get_working_days_details(self, lwp=None, for_preview=0):
 		payroll_settings = frappe.get_cached_value(
 			"Payroll Settings",
