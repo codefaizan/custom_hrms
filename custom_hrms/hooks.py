@@ -150,7 +150,7 @@ app_license = "mit"
 
 
 scheduler_events = {
-    "on_boot": [
+    "all": [
         "custom_hrms.hrms_pakistan.patch.patch_calculate_tax_by_tax_slab"
     ]
 }
