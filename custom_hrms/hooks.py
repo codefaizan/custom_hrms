@@ -129,9 +129,9 @@ app_license = "mit"
 # ---------------
 # Override standard doctype classes
 
-override_doctype_class = {
- 	"Salary Slip": "custom_hrms.hrms_pakistan.cal_tax.SalarySlip"
-}
+# override_doctype_class = {
+#     "SalarySlip": "custom_hrms.hrms_pakistan.cal_tax.CustomSalarySlip"
+# }
 
 # Document Events
 # ---------------
@@ -147,6 +147,13 @@ override_doctype_class = {
 
 # Scheduled Tasks
 # ---------------
+
+
+scheduler_events = {
+    "on_boot": [
+        "custom_hrms.hrms_pakistan.patch.patch_calculate_tax_by_tax_slab"
+    ]
+}
 
 # scheduler_events = {
 # 	"all": [
