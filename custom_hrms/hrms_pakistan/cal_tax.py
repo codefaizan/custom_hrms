@@ -467,6 +467,26 @@ class SalarySlip(TransactionBase):
 
 		make_salary_slip(self._salary_structure_doc.name, self)
 	
+	def add_earning_for_hourly_wages(self, doc, salary_component, amount):
+		row_exists = False
+		for row in doc.earnings:
+			if row.salary_component == salary_component:
+				row.amount = amount
+				row_exists = True
+				break
+
+		if not row_exists:
+			wages_row = {
+				"salary_component": salary_component,
+				"abbr": frappe.db.get_value(
+					"Salary Component", salary_component, "salary_component_abbr", cache=True
+				),
+				"amount": self.hour_rate * self.total_working_hours,
+				"default_amount": 0.0,
+				"additional_amount": 0.0,
+			}
+			doc.append("earnings", wages_row)
+	
 	
 
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
