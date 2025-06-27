@@ -2227,7 +2227,6 @@ def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=Non
 			other_taxes_and_charges = tax_amount * flt(d.percent) / 100
 			tax_amount += other_taxes_and_charges
 			total_other_taxes_and_charges += other_taxes_and_charges
-			frappe.log_error("Total tax amount", tax_amount)
 
 	return tax_amount, total_other_taxes_and_charges
 
