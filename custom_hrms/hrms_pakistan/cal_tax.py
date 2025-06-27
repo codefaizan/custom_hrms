@@ -94,6 +94,17 @@ class SalarySlip(TransactionBase):
 			)
 
 		return self.__joining_date
+	
+	@property
+	def relieving_date(self):
+		if not hasattr(self, "__relieving_date"):
+			self.__relieving_date = frappe.get_cached_value(
+				"Employee",
+				self.employee,
+				"relieving_date",
+			)
+
+		return self.__relieving_date
 
 	def validate_dates(self):
 		self.validate_from_to_dates("start_date", "end_date")
