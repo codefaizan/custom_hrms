@@ -294,6 +294,46 @@ class SalarySlip(TransactionBase):
 			frappe.cache().hset(HOLIDAYS_BETWEEN_DATES, key, holiday_dates)
 
 		return holiday_dates
+	
+	def calculate_lwp_or_ppl_based_on_leave_application(
+		self, holidays, working_days_list, daily_wages_fraction_for_half_day
+	):
+		lwp = 0
+		leaves = get_lwp_or_ppl_for_date_range(
+			self.employee,
+			self.start_date,
+			self.end_date,
+		)
+
+		for d in working_days_list:
+			if self.relieving_date and d > self.relieving_date:
+				break
+
+			leave = leaves.get(d)
+
+			if not leave:
+				continue
+
+			if not leave.include_holiday and getdate(d) in holidays:
+				continue
+
+			equivalent_lwp_count = 0
+			fraction_of_daily_salary_per_leave = flt(leave.fraction_of_daily_salary_per_leave)
+
+			is_half_day_leave = False
+			if cint(leave.half_day) and (leave.half_day_date == d or leave.from_date == leave.to_date):
+				is_half_day_leave = True
+
+			equivalent_lwp_count = (1 - daily_wages_fraction_for_half_day) if is_half_day_leave else 1
+
+			if cint(leave.is_ppl):
+				equivalent_lwp_count *= (
+					(1 - fraction_of_daily_salary_per_leave) if fraction_of_daily_salary_per_leave else 1
+				)
+
+			lwp += equivalent_lwp_count
+
+		return lwp
 
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
 	from hrms.hr.utils import calculate_tax_with_marginal_relief
