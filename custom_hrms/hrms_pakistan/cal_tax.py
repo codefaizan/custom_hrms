@@ -2193,8 +2193,8 @@ def get_payroll_payable_account(company, payroll_entry):
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
 	from hrms.hr.utils import calculate_tax_with_marginal_relief
 
-	tax_amount = 0
-	total_other_taxes_and_charges = 0
+	tax_amount = 5
+	total_other_taxes_and_charges = 5
 
 	if annual_taxable_earning > tax_slab.tax_relief_limit:
 		eval_locals.update({"annual_taxable_earning": annual_taxable_earning})
