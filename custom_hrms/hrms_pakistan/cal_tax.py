@@ -81,8 +81,8 @@ class SalarySlip(TransactionBase):
 			"floor": floor,
 		}
 
-	def autoname(self):
-		self.name = make_autoname(self.series)
+	# def autoname(self):
+	# 	self.name = make_autoname(self.series)
 
 	@property
 	def joining_date(self):
