@@ -105,6 +105,18 @@ class SalarySlip(TransactionBase):
 			)
 
 		return self.__relieving_date
+	
+	@property
+	def actual_end_date(self):
+		if not hasattr(self, "__actual_end_date"):
+			self.__actual_end_date = self.end_date
+
+			if self.relieving_date and getdate(self.start_date) <= self.relieving_date < getdate(
+				self.end_date
+			):
+				self.__actual_end_date = self.relieving_date
+
+		return self.__actual_end_date
 
 	def validate_dates(self):
 		self.validate_from_to_dates("start_date", "end_date")
