@@ -1156,11 +1156,11 @@ class SalarySlip(TransactionBase):
 				row.condition = sanitize_expression(row.condition)
 				row.formula = sanitize_expression(row.formula)
 
-	def add_structure_components(self, component_type):
-		self.data, self.default_data = self.get_data_for_eval()
+	# def add_structure_components(self, component_type):
+	# 	self.data, self.default_data = self.get_data_for_eval()
 
-		for struct_row in self.salary_structure_doc.get(component_type):
-			self.add_structure_component(struct_row, component_type)
+	# 	for struct_row in self.salary_structure_doc.get(component_type):
+	# 		self.add_structure_component(struct_row, component_type)
 
 	# def add_structure_component(self, struct_row, component_type):
 	# 	if (
