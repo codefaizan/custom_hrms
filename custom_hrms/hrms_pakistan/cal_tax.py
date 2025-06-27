@@ -504,6 +504,23 @@ class SalarySlip(TransactionBase):
 				flt(self.gross_pay) - flt(self.total_deduction) - flt(self.get("total_loan_repayment"))
 			)
 		self.set_base_totals()
+	
+	def set_base_totals(self):
+		self.base_gross_pay = flt(self.gross_pay) * flt(self.exchange_rate)
+		self.base_total_deduction = flt(self.total_deduction) * flt(self.exchange_rate)
+		self.rounded_total = rounded(self.net_pay or 0)
+		self.base_net_pay = flt(self.net_pay) * flt(self.exchange_rate)
+		self.base_rounded_total = rounded(self.base_net_pay or 0)
+		self.set_net_total_in_words()
+
+	def set_net_total_in_words(self):
+		doc_currency = self.currency
+		company_currency = erpnext.get_company_currency(self.company)
+		total = self.net_pay if self.is_rounding_total_disabled() else self.rounded_total
+		base_total = self.base_net_pay if self.is_rounding_total_disabled() else self.base_rounded_total
+		self.total_in_words = money_in_words(total, doc_currency)
+		self.base_total_in_words = money_in_words(base_total, company_currency)
+
 		
 	
 	
