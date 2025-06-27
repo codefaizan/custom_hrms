@@ -421,6 +421,12 @@ class SalarySlip(TransactionBase):
 
 		return lwp
 	
+	def get_date_details(self):
+		if not self.end_date:
+			date_details = get_start_end_dates(self.payroll_frequency, self.start_date or self.posting_date)
+			self.start_date = date_details.start_date
+			self.end_date = date_details.end_date
+	
 	
 
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
