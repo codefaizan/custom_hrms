@@ -282,6 +282,17 @@ class SalarySlip(TransactionBase):
 		else:
 			self.payment_days = 0
 
+	def get_holidays_for_employee(self, start_date, end_date):
+		holiday_list = get_holiday_list_for_employee(self.employee)
+		key = f"{holiday_list}:{start_date}:{end_date}"
+		holiday_dates = frappe.cache().hget(HOLIDAYS_BETWEEN_DATES, key)
+
+		if not holiday_dates:
+			holiday_dates = get_holiday_dates_between(holiday_list, start_date, end_date)
+			frappe.cache().hset(HOLIDAYS_BETWEEN_DATES, key, holiday_dates)
+
+		return holiday_dates
+
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
 	from hrms.hr.utils import calculate_tax_with_marginal_relief
 
