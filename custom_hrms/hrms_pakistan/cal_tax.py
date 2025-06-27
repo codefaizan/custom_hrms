@@ -452,6 +452,20 @@ class SalarySlip(TransactionBase):
 
 			for data in timesheets:
 				self.append("timesheets", {"time_sheet": data.name, "working_hours": data.total_hours})
+
+	def pull_sal_struct(self):
+		from hrms.payroll.doctype.salary_structure.salary_structure import make_salary_slip
+
+		if self.salary_slip_based_on_timesheet:
+			self.salary_structure = self._salary_structure_doc.name
+			self.hour_rate = self._salary_structure_doc.hour_rate
+			self.base_hour_rate = flt(self.hour_rate) * flt(self.exchange_rate)
+			self.total_working_hours = sum([d.working_hours or 0.0 for d in self.timesheets]) or 0.0
+			wages_amount = self.hour_rate * self.total_working_hours
+
+			self.add_earning_for_hourly_wages(self, self._salary_structure_doc.salary_component, wages_amount)
+
+		make_salary_slip(self._salary_structure_doc.name, self)
 	
 	
 
