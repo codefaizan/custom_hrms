@@ -64,27 +64,28 @@ TAX_COMPONENTS_BY_COMPANY = "tax_components_by_company"
 
 
 class SalarySlip(TransactionBase):
-	def setup_init(self, *args, **kwargs):
-		super().setup_init(*args, **kwargs)
-		self.series = f"Sal Slip/{self.employee}/.#####"
-		self.whitelisted_globals = {
-			"int": int,
-			"float": float,
-			"long": int,
-			"round": round,
-			"rounded": rounded,
-			"date": date,
-			"getdate": getdate,
-			"get_first_day": get_first_day,
-			"get_last_day": get_last_day,
-			"ceil": ceil,
-			"floor": floor,
-		}
+	# def setup_init(self, *args, **kwargs):
+	# 	super().setup_init(*args, **kwargs)
+	# 	self.series = f"Sal Slip/{self.employee}/.#####"
+	# 	self.whitelisted_globals = {
+	# 		"int": int,
+	# 		"float": float,
+	# 		"long": int,
+	# 		"round": round,
+	# 		"rounded": rounded,
+	# 		"date": date,
+	# 		"getdate": getdate,
+	# 		"get_first_day": get_first_day,
+	# 		"get_last_day": get_last_day,
+	# 		"ceil": ceil,
+	# 		"floor": floor,
+	# 	}
 
 	# def autoname(self):
 	# 	self.name = make_autoname(self.series)
 
 	def calculate_variable_tax(self, tax_component):
+		frappe.msgprint("This is a placeholder message for debugging purposes. calculate_variable_tax function called.")
 		self.previous_total_paid_taxes = self.get_tax_paid_in_period(
 			self.payroll_period.start_date, self.start_date, tax_component
 		)
@@ -128,6 +129,8 @@ class SalarySlip(TransactionBase):
 
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
 	from hrms.hr.utils import calculate_tax_with_marginal_relief
+
+	frappe.msgprint("This is a placeholder message for debugging purposes. calculate_tax_by_tax_slab function called.")
 
 	tax_amount = 5
 	total_other_taxes_and_charges = 5
