@@ -84,6 +84,34 @@ class SalarySlip(TransactionBase):
 	# def autoname(self):
 	# 	self.name = make_autoname(self.series)
 
+	@frappe.whitelist()
+	def get_emp_and_working_day_details(self):
+		"""First time, load all the components from salary structure"""
+		if self.employee:
+			self.set("earnings", [])
+			self.set("deductions", [])
+			if hasattr(self, "loans"):
+				self.set("loans", [])
+
+			if self.payroll_frequency:
+				self.get_date_details()
+
+			self.validate_dates()
+
+			# getin leave details
+			self.get_working_days_details()
+			struct = self.check_sal_struct()
+
+			if struct:
+				self.set_salary_structure_doc()
+				self.salary_slip_based_on_timesheet = (
+					self._salary_structure_doc.salary_slip_based_on_timesheet or 0
+				)
+				self.set_time_sheet()
+				self.pull_sal_struct()
+
+			process_loan_interest_accrual_and_demand(self)
+
 	def calculate_variable_tax(self, tax_component):
 		frappe.msgprint("This is a placeholder message for debugging purposes. calculate_variable_tax function called.")
 		self.previous_total_paid_taxes = self.get_tax_paid_in_period(
