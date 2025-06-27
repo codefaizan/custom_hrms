@@ -1136,25 +1136,25 @@ class SalarySlip(TransactionBase):
 			)
 		return tax_deducted
 
-	def calculate_component_amounts(self, component_type):
-		if not getattr(self, "salary_structure_doc", None):
-			self.set_salary_structure_doc()
+	# def calculate_component_amounts(self, component_type):
+	# 	if not getattr(self, "salary_structure_doc", None):
+	# 		self.set_salary_structure_doc()
 
-		self.add_structure_components(component_type)
-		self.add_additional_salary_components(component_type)
+	# 	self.add_structure_components(component_type)
+	# 	self.add_additional_salary_components(component_type)
 
-		if component_type == "earnings":
-			self.add_employee_benefits()
-		else:
-			self.add_tax_components()
+	# 	if component_type == "earnings":
+	# 		self.add_employee_benefits()
+	# 	else:
+	# 		self.add_tax_components()
 
-	def set_salary_structure_doc(self) -> None:
-		self.salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
-		# sanitize condition and formula fields
-		for table in ("earnings", "deductions"):
-			for row in self.salary_structure_doc.get(table):
-				row.condition = sanitize_expression(row.condition)
-				row.formula = sanitize_expression(row.formula)
+	# def set_salary_structure_doc(self) -> None:
+	# 	self.salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
+	# 	# sanitize condition and formula fields
+	# 	for table in ("earnings", "deductions"):
+	# 		for row in self.salary_structure_doc.get(table):
+	# 			row.condition = sanitize_expression(row.condition)
+	# 			row.formula = sanitize_expression(row.formula)
 
 	# def add_structure_components(self, component_type):
 	# 	self.data, self.default_data = self.get_data_for_eval()
