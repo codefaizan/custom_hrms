@@ -1240,42 +1240,42 @@ class SalarySlip(TransactionBase):
 
 		return frappe.cache().get_value(SALARY_COMPONENT_VALUES, generator=fetch_component_values)
 
-	def eval_condition_and_formula(self, struct_row, data):
-		try:
-			condition, formula, amount = struct_row.condition, struct_row.formula, struct_row.amount
-			if condition and not frappe.safe_eval(condition, self.whitelisted_globals, data):
-				return None
-			if struct_row.amount_based_on_formula and formula:
-				amount = flt(
-					frappe.safe_eval(formula, self.whitelisted_globals, data), struct_row.precision("amount")
-				)
-			if amount:
-				data[struct_row.abbr] = amount
+	# def eval_condition_and_formula(self, struct_row, data):
+	# 	try:
+	# 		condition, formula, amount = struct_row.condition, struct_row.formula, struct_row.amount
+	# 		if condition and not frappe.safe_eval(condition, self.whitelisted_globals, data):
+	# 			return None
+	# 		if struct_row.amount_based_on_formula and formula:
+	# 			amount = flt(
+	# 				frappe.safe_eval(formula, self.whitelisted_globals, data), struct_row.precision("amount")
+	# 			)
+	# 		if amount:
+	# 			data[struct_row.abbr] = amount
 
-			return amount
+	# 		return amount
 
-		except NameError as ne:
-			throw_error_message(
-				struct_row,
-				ne,
-				title=_("Name error"),
-				description=_("This error can be due to missing or deleted field."),
-			)
-		except SyntaxError as se:
-			throw_error_message(
-				struct_row,
-				se,
-				title=_("Syntax error"),
-				description=_("This error can be due to invalid syntax."),
-			)
-		except Exception as exc:
-			throw_error_message(
-				struct_row,
-				exc,
-				title=_("Error in formula or condition"),
-				description=_("This error can be due to invalid formula or condition."),
-			)
-			raise
+	# 	except NameError as ne:
+	# 		throw_error_message(
+	# 			struct_row,
+	# 			ne,
+	# 			title=_("Name error"),
+	# 			description=_("This error can be due to missing or deleted field."),
+	# 		)
+	# 	except SyntaxError as se:
+	# 		throw_error_message(
+	# 			struct_row,
+	# 			se,
+	# 			title=_("Syntax error"),
+	# 			description=_("This error can be due to invalid syntax."),
+	# 		)
+	# 	except Exception as exc:
+	# 		throw_error_message(
+	# 			struct_row,
+	# 			exc,
+	# 			title=_("Error in formula or condition"),
+	# 			description=_("This error can be due to invalid formula or condition."),
+	# 		)
+	# 		raise
 
 	def add_employee_benefits(self):
 		for struct_row in self.salary_structure_doc.get("earnings"):
