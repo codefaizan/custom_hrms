@@ -334,6 +334,8 @@ class SalarySlip(TransactionBase):
 			lwp += equivalent_lwp_count
 
 		return lwp
+	
+	
 
 def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=None, eval_locals=None):
 	from hrms.hr.utils import calculate_tax_with_marginal_relief
@@ -344,3 +346,43 @@ def calculate_tax_by_tax_slab(annual_taxable_earning, tax_slab, eval_globals=Non
 	total_other_taxes_and_charges = 5
 
 	return tax_amount, total_other_taxes_and_charges
+
+def get_lwp_or_ppl_for_date_range(employee, start_date, end_date):
+	LeaveApplication = frappe.qb.DocType("Leave Application")
+	LeaveType = frappe.qb.DocType("Leave Type")
+
+	leaves = (
+		frappe.qb.from_(LeaveApplication)
+		.inner_join(LeaveType)
+		.on(LeaveType.name == LeaveApplication.leave_type)
+		.select(
+			LeaveApplication.name,
+			LeaveType.is_ppl,
+			LeaveType.fraction_of_daily_salary_per_leave,
+			LeaveType.include_holiday,
+			LeaveApplication.from_date,
+			LeaveApplication.to_date,
+			LeaveApplication.half_day,
+			LeaveApplication.half_day_date,
+		)
+		.where(
+			((LeaveType.is_lwp == 1) | (LeaveType.is_ppl == 1))
+			& (LeaveApplication.docstatus == 1)
+			& (LeaveApplication.status == "Approved")
+			& (LeaveApplication.employee == employee)
+			& ((LeaveApplication.salary_slip.isnull()) | (LeaveApplication.salary_slip == ""))
+			& ((LeaveApplication.from_date <= end_date) & (LeaveApplication.to_date >= start_date))
+		)
+	).run(as_dict=True)
+
+	leave_date_mapper = frappe._dict()
+	for leave in leaves:
+		if leave.from_date == leave.to_date:
+			leave_date_mapper[leave.from_date] = leave
+		else:
+			date_diff = (getdate(leave.to_date) - getdate(leave.from_date)).days
+			for i in range(date_diff + 1):
+				date = add_days(leave.from_date, i)
+				leave_date_mapper[date] = leave
+
+	return leave_date_mapper
