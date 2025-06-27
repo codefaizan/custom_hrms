@@ -426,6 +426,14 @@ class SalarySlip(TransactionBase):
 			date_details = get_start_end_dates(self.payroll_frequency, self.start_date or self.posting_date)
 			self.start_date = date_details.start_date
 			self.end_date = date_details.end_date
+
+	def set_salary_structure_doc(self) -> None:
+		self._salary_structure_doc = frappe.get_cached_doc("Salary Structure", self.salary_structure)
+		# sanitize condition and formula fields
+		for table in ("earnings", "deductions"):
+			for row in self._salary_structure_doc.get(table):
+				row.condition = sanitize_expression(row.condition)
+				row.formula = sanitize_expression(row.formula)
 	
 	
 
